@@ -1,16 +1,14 @@
 StampCollectorApp
 =================
 
-This repository contains samples and solutions for the
-Advanced Android course.
+This repository contains 4 stages of the Stamp Collector app for the 
+Stamp Collector app codelab.
 
 Introduction
 ------------
 
-The StampCollector app is a companion app for the RecyclerView codelab.
-This app....
-
-The code is provided in 4 steps.
+The StampCollector app is a companion app for the RecyclerView and
+Shared Preferences codelab.
 
 It demonstrates the following Android features:
 
@@ -20,11 +18,10 @@ It demonstrates the following Android features:
 Pre-requisites
 --------------
 
-- Familiarity with the general software development process for object-oriented
-applications using an IDE (Integrated Development Environment).
-- At least 1-3 years of experience with object-oriented programming and
-the Java programming language.
-
+- You should know how to program in Java
+- You should be familiar with a modern IDE, such as Android Studio
+- You should be comfortable with basic Android development, including but 
+  not limited to Activities, Views, and Layouts. 
 
 
 Getting Started
@@ -32,7 +29,7 @@ Getting Started
 
 1. [Install Android Studio](https://developer.android.com/studio/install.html),
 if you don't already have it.
-2. Download the sample.
+2. Download the sample code. The zip file will contain 4 apps.
 2. Import the sample into Android Studio.
 3. Build and run the sample.
 
