@@ -137,7 +137,7 @@ class StampCollectorActivity : AppCompatActivity() {
 
     private fun loadStamps(): ArrayList<StampData?> {
         //Fetch the data from the SharedPreferences object
-        val jsonStampString: String? = mSharedPref.getString(STAMP_KEY, ""
+        val jsonStampString: String? = mSharedPref.getString(STAMP_KEY, "")
         val gson = Gson()
         val type: Type = object : TypeToken<List<StampData?>?>() {}.type
         var loadData: ArrayList<StampData?> =
