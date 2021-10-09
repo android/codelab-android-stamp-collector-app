@@ -140,12 +140,7 @@ class StampCollectorActivity : AppCompatActivity() {
         val jsonStampString: String? = mSharedPref.getString(STAMP_KEY, "")
         val gson = Gson()
         val type: Type = object : TypeToken<List<StampData?>?>() {}.type
-        var loadData: ArrayList<StampData?> =
-            gson.fromJson(jsonStampString, type)
-        if (loadData == null) {
-            loadData = ArrayList()
-        }
-        return loadData
+        return gson.fromJson(jsonStampString, type)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
