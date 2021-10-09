@@ -1,0 +1,284 @@
+4. Implementing the RecyclerView
+
+The [RecyclerView](https://developer.android.com/reference/android/support/v7/widget/RecyclerView.html) class is a subclass of ViewGroup and is a resource-efficient way to display scrollable lists. Instead of creating a view for each item, whether or not the item is visible, RecyclerView creates a limited number of list items and reuses them to show visible content.
+
+To display your data in a RecyclerView object, you need the following:
+
+- A data source: You use sample data for this codelab.
+- A RecyclerView object: The scrolling list that contains the list items, which you already created in your ```activity_stamp_collector.xml``` layout file.
+- A row layout: Layout for each row in the RecyclerView.
+- A layout manager: RecyclerView requires an explicit layout manager to manage the arrangement of list items contained within it. The layout can be vertical, horizontal, or a grid. You will use a vertical linear layout manager in this codelab.
+- An adapter: The adapter connects your data to the RecyclerView and prepares the data in a view holder. In this codelab you create an adapter that updates the stamp data in your views.
+- A view holder: Inside your adapter, you create a ViewHolder class that contains the view information for displaying one item from the item's layout.
+
+https://developer.android.com/codelabs/android-stamp-collector/img/800672a1f57d2048.png
+
+Implement a RecyclerView
+
+To implement a RecyclerView in this codelab, you'll follow these steps:
+
+- Create a layout XML file for one item (a row layout).
+- Extend the [RecyclerView.Adapter](https://developer.android.com/reference/android/support/v7/widget/RecyclerView.Adapter.html) class and implement the ```onCreateViewHolder()```, ```getItemCount()```, and ```onBindViewHolder()``` methods.
+- Extend the [RecyclerView.ViewHolder](https://developer.android.com/reference/android/support/v7/widget/RecyclerView.ViewHolder.html) class to create a view holder for the item layout. You can add click behavior by overriding the ```onClick``` method.
+- In your ```StampCollectorActivity```, inside the ```onCreate()``` method, create a RecyclerView. Attach the RecyclerView with the adapter and a layout manager.
+
+The steps are described in more detail below.
+
+1. Create the layout for one item (a row layout)
+The layout for a RecyclerView item is kept in a separate layout file so that the adapter can change item views without affecting the layout of the activity.
+
+1. Create a new layout file in your Android Studio project:
+- Select File > New > Android resource file.
+- Name the file ```recycler_row_layout```.
+- Choose Layout as the resource type.
+- Choose androidx.constraintlayout.widget.ConstraintLayout as the root element.
+- Leave the default for the other options. Click OK.
+2. Open the ```recycler_row_layout.xml``` file and add the following code inside the ```ConstraintLayout``` tag.
+```
+<ImageView
+   android:id="@+id/stamp_pic"
+   android:layout_width="100dp"
+   android:layout_height="100dp"
+   android:layout_marginBottom="16dp"
+   android:layout_marginStart="16dp"
+   android:layout_marginTop="16dp"
+   android:contentDescription="@string/stamp_pic_desc"
+   android:scaleType="fitXY"
+   app:layout_constraintBottom_toBottomOf="parent"
+   app:layout_constraintStart_toStartOf="parent"
+   app:layout_constraintTop_toTopOf="parent"
+   app:srcCompat="@mipmap/ic_launcher" />
+
+<TextView
+   android:id="@+id/stamp_title"
+   android:layout_width="0dp"
+   android:layout_height="100dp"
+   android:layout_marginBottom="16dp"
+   android:layout_marginStart="16dp"
+   android:layout_marginTop="16dp"
+   android:gravity="center_vertical"
+   android:maxLines="6"
+   android:scrollbars="vertical"
+   android:text="@string/stamp_title"
+   android:textAlignment="center"
+   android:textColor="@android:color/black"
+   android:padding="16dp"
+   app:layout_constraintBottom_toBottomOf="parent"
+   app:layout_constraintStart_toEndOf="@+id/stamp_pic"
+   app:layout_constraintEnd_toStartOf="@+id/stamp_count"
+   app:layout_constraintTop_toTopOf="parent" />
+
+<TextView
+   android:id="@+id/stamp_count"
+   android:layout_width="wrap_content"
+   android:layout_height="100dp"
+   android:layout_marginBottom="16dp"
+   android:layout_marginStart="16dp"
+   android:layout_marginTop="16dp"
+   android:gravity="center_vertical"
+   android:text="@string/stamp_counter"
+   android:textAlignment="center"
+   android:textColor="@android:color/black"
+   android:padding="16dp"
+   app:layout_constraintBottom_toBottomOf="parent"
+   app:layout_constraintEnd_toStartOf="@+id/add_button"
+   app:layout_constraintTop_toTopOf="parent" />
+
+<Button
+   android:id="@+id/add_button"
+   android:layout_width="50dp"
+   android:layout_height="50dp"
+   android:layout_marginLeft="16dp"
+   android:layout_marginRight="16dp"
+   android:layout_marginTop="8dp"
+   android:text="@string/add_counter_button"
+   android:textColor="@color/colorPrimaryDark"
+   app:layout_constraintEnd_toEndOf="parent"
+   app:layout_constraintTop_toTopOf="parent" />
+
+<Button
+   android:id="@+id/sub_button"
+   android:layout_width="50dp"
+   android:layout_height="50dp"
+   android:layout_marginBottom="8dp"
+   android:layout_marginLeft="16dp"
+   android:layout_marginRight="16dp"
+   android:layout_marginTop="8dp"
+   android:text="@string/subtract_counter_button"
+   android:textColor="@color/colorPrimaryDark"
+   app:layout_constraintBottom_toBottomOf="parent"
+   app:layout_constraintEnd_toEndOf="parent"
+   app:layout_constraintTop_toBottomOf="@+id/add_button" />
+```
+
+Note: In Android Studio, you see an error saying that the namespace "app" is not bound. To fix the error, press alt+Enter for windows or option+Enter for MacOS**,** which adds, *xmlns:app="http://schemas.android.com/apk/res-auto"* to the root tag.
+
+3. In the ConstraintLayout element, change the value for android:layout_height attribute to "wrap_content". The ```recycler_row_layout.xml``` layout file in Design tab should look like the following:
+
+https://developer.android.com/codelabs/android-stamp-collector/img/8175e5048364daae.png
+
+2. Create an adapter
+
+In the RecyclerView, the adapter acts as a bridge between the data and the views that are displayed. The adapter receives or retrieves the data, makes the data displayable, and places the data in a view.
+
+You need to create your own custom adapter class. A class extending ```RecyclerView.Adapter``` implements a view holder, and must override the following callbacks:
+
+- ```onCreateViewHolder()``` inflates an item view and returns a new view holder that contains the item. The RecyclerView calls this method when the RecyclerView needs a new view holder to represent an item.
+- ```onBindViewHolder()``` sets the contents of an item at a given position in the RecyclerView. The RecyclerView calls this method when, for example, a new item scrolls into view.
+- ```getItemCount(```) returns the total number of items in the data set held by the adapter.
+
+To create your own custom adapter, follow these steps:
+
+1. Right-click ```java/com.example.stampcollectorapp``` and select New > Kotlin Class. Name the new class ```StampAdapter```, leaving the default options selected.
+2. Give the ```StampAdapter``` class the following signature.
+
+```
+class StampAdapter : 
+	RecyclerView.Adapter<StampHolder?>() {
+}
+```
+The ```StampAdapter``` class extends a generic adapter for RecyclerView to use a view holder that is specific for your app and defined inside ```StampAdapter.StampHolder```. The class shows an error, because you have not defined it. You define it in later steps.
+3.Click on the ```StampAdapter``` class declaration, then click the red light bulb on the left side of the pane. Select Implement methods. Select all three methods and click OK.
+Empty placeholders are created for the methods that you must implement. Note how the ```onCreateViewHolder``` and ```onBindViewHolder``` methods both reference the ```StampHolder``` object, which hasn't been implemented yet.
+
+4.Define member variables to hold the data set inside ```StampAdapter```. Initialize it using a constructor.
+```
+class StampAdapter(data: ArrayList<StampData?>
+) : RecyclerView.Adapter<StampHolder?>() {
+
+    private val mStampDataArray: ArrayList<StampData?> = data
+}
+```
+The ```mStampDataArray``` object holds the data set. The ```LayoutInflator``` object is used for inflating recycler_row_layout with the adapter class in next step.
+
+5. In the onCreateViewHolder() method, obtain an instance of ```LayoutInflater``` from the provided context (context of the parent). The layout inflater knows how to inflate an XML layout into a hierarchy of view objects.
+```
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StampHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_row_layout,
+            parent, false)
+        return StampHolder(view)
+    }
+```
+The ```inflate()``` method let's you create a view object by attaching your layout XML file (```recycler_row_layout.xml```) . Once you have the view object, you can pass it as a parameter to the constructor of the ```StampHolder``` class.
+
+3. Create a view holder
+
+1. Inside the ```StampAdapter``` class, add a new ```StampHolder``` inner class with the following signature.
+
+```
+inner class StampHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+}
+```
+- Defining a class inside another class is called creating a nested class.
+- Since ```StampHolder``` is only used by ```StampAdapter```, creating it inside ```StampAdapter``` shows this relationship. This is not mandatory, but it helps other developers understand the structure of your program.
+- Add```private``` ```val``` ```view``` of type ```View``` as a parameter to the ```StampHolder``` class constructor.
+- Make ```StampHolder``` a subclass of ```RecyclerView.ViewHolder``` and pass the ```view``` parameter into the superclass constructor.
+
+2. In the ```StampHolder``` inner class, define all the view objects that were added in the ```recycler_row_layout.xml``` layout file. Also define an integer counter variable and a ```StampData``` class object as member variables.
+
+```
+ var mStampTitleHolder: TextView = itemView.findViewById(R.id.stamp_title)
+        var mStampCounterHolder: TextView = itemView.findViewById(R.id.stamp_count)
+        var mStampIconHolder: ImageView = itemView.findViewById(R.id.stamp_pic)
+        private var mAddButton: Button = itemView.findViewById(R.id.add_button)
+        private var mSubButton: Button = itemView.findViewById(R.id.sub_button)
+        private var mCounter = 0
+        private var mEditStampData: StampData? = null
+```
+
+3. In the ```StampAdapter``` class, inside ```onBindViewHolder()```, bind the data set to the views that are already defined in the ```StampHolder``` class.
+```     
+  val currentStampData = mStampDataArray[position]
+        holder.mStampTitleHolder.text = currentStampData!!.stampTitle
+        holder.mStampIconHolder.setImageResource(currentStampData.stampIcon)
+        holder.mStampCounterHolder.text = currentStampData.stampCounter.toString()
+```
+
+4. Attach the adapter to the RecyclerView in the StampCollectorActivity
+
+Now that you've defined your own custom RecyclerView adapter, you can create an instance of the adapter in the StampCollectorActivity. To add the RecyclerView, follow these steps:
+
+1. Inside ```StampCollectorActivity```, define a ```RecyclerView``` object as a member variable.
+
+```
+private lateinit var mRecyclerView: RecyclerView
+```
+
+The [lateinit](https://kotlinlang.org/docs/properties.html#late-initialized-properties-and-variables) modifier us used on ```var```  non-null properties declared inside the body of a class that are not initialized in the constructor.
+
+2. Inside ```StampCollectorActivity```, define a ```StampAdapter``` object as a member variable.
+
+```
+private lateinit var mAdapter: StampAdapter
+```
+3. Create a ```setupRecyclerView()``` method to connect the RecyclerView with your ```StampCollectorActivity```. In ```setUpRecyclerView()```, initialize the ```RecyclerView``` object. Set a LinearLayoutManager object, and attach the ```RecyclerView``` object to the ```StampAdapter``` object that will populate the data set.
+
+```
+    private fun setUpRecyclerView() {
+
+        //Initialize RecyclerView object
+        mRecyclerView = findViewById(R.id.mRecyclerView)
+
+        //Set up a line after each row, so it looks like a list
+        mRecyclerView.addItemDecoration(DividerItemDecoration(
+            this, DividerItemDecoration.VERTICAL))
+
+        //Set up the LayoutManager for RecyclerView
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        //Attach adapter object with RecyclerView
+        mRecyclerView.adapter = mAdapter
+    }
+```
+
+2. In ```onCreate()```, initialize the adapter object. Call the ```setupRecyclerView()``` method at the end.
+```
+        mAdapter = StampAdapter(mStampData)
+        setUpRecyclerView()
+```
+
+5. Handle user interaction inside the RecyclerView
+
+1. To increase and decrease the stamp count, add click handlers to the "+" and "-" buttons. In ```StampAdapter.kt```, add the following code to the ```StampHolder``` constructor.
+2. Add the method ```changeStampCount()``` inside the StampHolder class.
+```
+ private fun changeStampCount(increaseCount: Boolean) {
+}
+```
+
+Inside ```changeStampCount()```, you will first get the current instance of the ```StampData``` class in the ArrayList ```mStampDataArray```, then either increment or decrement the count value of ```mCounter``` depending on the ```increaseCount``` boolean argument. 
+
+```
+            // Get the current StampData object by using the
+            // getAdapterPosition() method
+            mEditStampData = mStampDataArray[adapterPosition]
+
+            //Access the current counter value from StampData object
+            mCounter = mEditStampData!!.stampCounter
+
+            //Increment the counter value by one every time
+            if (increaseCount) {
+                mCounter++
+            } else {
+                if (mCounter > 0) {
+                    mCounter--
+                }
+            }
+```
+After changing the count values you need to update the instance in the ```mStampDataArray``` ArrayList object, and notify the adapter.
+
+```
+            //Update the new counter value in StampData object
+            mEditStampData!!.stampCounter = mCounter
+
+            //Update the current object in the ArrayList object too
+            mStampDataArray[adapterPosition] = mEditStampData
+
+            //Notify the adapter about the changes
+            // made at the current position
+            notifyItemChanged(adapterPosition)
+```
+
+3. Once again, run the app. Now you can interact with the +/- buttons to increase and decrease the stamp counter for each stamp.
+
+When you open the app again, the count resets to 0. In the next part of this codelab you will learn how to save data locally using the SharedPreferences interface.

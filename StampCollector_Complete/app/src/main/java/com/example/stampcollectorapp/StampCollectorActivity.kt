@@ -37,9 +37,12 @@ class StampCollectorActivity : AppCompatActivity() {
     private var mStampIcon: TypedArray? = null
     private lateinit var mStampCounter: IntArray
     private lateinit var mStampData: ArrayList<StampData?>
+
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: StampAdapter
+
     private lateinit var mSharedPref: SharedPreferences
+
     private var mAddAndUpdateStampUtility: AddAndUpdateStampUtility? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +86,7 @@ class StampCollectorActivity : AppCompatActivity() {
 
         //Attach adapter object with RecyclerView
         mRecyclerView.adapter = mAdapter
+
         val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -91,8 +95,7 @@ class StampCollectorActivity : AppCompatActivity() {
                 target: RecyclerView.ViewHolder,
             ): Boolean {
                 return false
-            }//material alert dialog explanation in most recent codelab
-
+            }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position: Int = viewHolder.absoluteAdapterPosition

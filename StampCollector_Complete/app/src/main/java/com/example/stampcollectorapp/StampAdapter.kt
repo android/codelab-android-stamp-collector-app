@@ -50,13 +50,16 @@ class StampAdapter(
     override fun getItemCount(): Int = mStampDataArray.size
 
     inner class StampHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         var mStampTitleHolder: TextView = itemView.findViewById(R.id.stamp_title)
         var mStampCounterHolder: TextView = itemView.findViewById(R.id.stamp_count)
         var mStampIconHolder: ImageView = itemView.findViewById(R.id.stamp_pic)
+
         private var mAddButton: Button = itemView.findViewById(R.id.add_button)
         private var mSubButton: Button = itemView.findViewById(R.id.sub_button)
         private var mCounter = 0
         private var mEditStampData: StampData? = null
+
         private fun changeStampCount(increaseCount: Boolean) {
             // Get the current StampData object by using the
             // getAdapterPosition() method

@@ -15,35 +15,45 @@
  */
 package com.example.stampcollectorapp
 
-import android.support.v7.app.AppCompatActivity
+import android.content.res.TypedArray
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import java.util.ArrayList
 
 class StampCollectorActivity : AppCompatActivity() {
-    private var mStampTitle: Array<String?>
+    private lateinit var mStampTitle: Array<String?>
     private var mStampIcon: TypedArray? = null
-    private var mStampCounter: IntArray
-    private var mStampData: ArrayList<StampData>? = null
-    private var mRecyclerView: RecyclerView? = null
-    private var mAdapter: StampAdapter? = null
-    protected fun onCreate(savedInstanceState: Bundle?) {
+    private lateinit var mStampCounter: IntArray
+    private lateinit var mStampData: ArrayList<StampData?>
+    private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mAdapter: StampAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stamp_collector)
-        mStampTitle = getResources().getStringArray(R.array.stamp_title_array)
-        mStampCounter = getResources().getIntArray(R.array.stamp_counter_array)
-        mStampIcon = getResources().obtainTypedArray(R.array.stamp_icon_array)
+
+        mStampTitle = resources.getStringArray(R.array.stamp_title_array)
+        mStampCounter = resources.getIntArray(R.array.stamp_counter_array)
+        mStampIcon = resources.obtainTypedArray(R.array.stamp_icon_array)
+
         setupData(mStampTitle, mStampIcon, mStampCounter)
+
         mAdapter = StampAdapter(this, mStampData)
         setUpRecyclerView()
     }
 
-    fun setupData(title: Array<String?>, icon: TypedArray?, count: IntArray) {
+    private fun setupData(title: Array<String?>, icon: TypedArray?, count: IntArray) {
         mStampData = ArrayList()
+
         for (i in title.indices) {
             val instance = StampData()
             instance.stampTitle = title[i]
-            instance.stampIcon = icon.getResourceId(i, 0)
+            instance.stampIcon = icon!!.getResourceId(i, 0)
             instance.stampCounter = count[i]
-            mStampData!!.add(instance)
+            mStampData.add(instance)
         }
     }
 
@@ -57,9 +67,9 @@ class StampCollectorActivity : AppCompatActivity() {
             this, DividerItemDecoration.VERTICAL))
 
         //Set up the LayoutManager for RecyclerView
-        mRecyclerView.setLayoutManager(LinearLayoutManager(this))
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
 
         //Attach adapter object with RecyclerView
-        mRecyclerView.setAdapter(mAdapter)
+        mRecyclerView.adapter = mAdapter
     }
 }

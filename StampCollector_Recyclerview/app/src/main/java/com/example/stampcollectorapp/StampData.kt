@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        jcenter() // Warning: this repository is going to shut down soon
+package com.example.stampcollectorapp
+
+class StampData {
+    var stampTitle: String? = null
+    var stampCounter = 0
+    var stampIcon: Int
+
+    init {
+        stampIcon = R.drawable.general_stamp
     }
 }
-rootProject.name = "StampCollectorApp"
-include ':app'

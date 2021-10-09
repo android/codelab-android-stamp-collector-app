@@ -16,7 +16,6 @@
 package com.example.stampcollectorapp
 
 import android.content.Context
-import com.example.stampcollectorapp.StampData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.stampcollectorapp.StampAdapter.StampHolder
 import android.view.LayoutInflater
@@ -24,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import com.example.stampcollectorapp.R
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import android.widget.TextView
 import java.util.ArrayList
@@ -34,9 +32,9 @@ class StampAdapter(
     data: ArrayList<StampData?>
 ) : RecyclerView.Adapter<StampHolder>() {
     private val mStampDataArray: ArrayList<StampData?>
-    private val mLayoutInflater: LayoutInflater
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StampHolder {
-        val view = mLayoutInflater.inflate(R.layout.recycler_row_layout,
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_row_layout,
             parent, false)
         return StampHolder(view)
     }
@@ -54,13 +52,14 @@ class StampAdapter(
     }
 
     inner class StampHolder(itemView: View) : ViewHolder(itemView) {
-        var mStampTitleHolder: TextView
-        var mStampCounterHolder: TextView
-        var mStampIconHolder: ImageView
-        var mAddButton: Button
-        var mSubButton: Button
+        var mStampTitleHolder: TextView = itemView.findViewById(R.id.stamp_title)
+        var mStampCounterHolder: TextView = itemView.findViewById(R.id.stamp_count)
+        var mStampIconHolder: ImageView = itemView.findViewById(R.id.stamp_pic)
+        private var mAddButton: Button = itemView.findViewById(R.id.add_button)
+        private var mSubButton: Button = itemView.findViewById(R.id.sub_button)
         private var mCounter = 0
         private var mEditStampData: StampData? = null
+
         private fun changeStampCount(increaseCount: Boolean) {
             // Get the current StampData object by using the
             // getAdapterPosition() method
@@ -90,11 +89,6 @@ class StampAdapter(
         }
 
         init {
-            mStampTitleHolder = itemView.findViewById(R.id.stamp_title)
-            mStampIconHolder = itemView.findViewById(R.id.stamp_pic)
-            mStampCounterHolder = itemView.findViewById(R.id.stamp_count)
-            mAddButton = itemView.findViewById(R.id.add_button)
-            mSubButton = itemView.findViewById(R.id.sub_button)
 
             //Use OnClick Listeners to Handle Add Button
             mAddButton.setOnClickListener { changeStampCount(true) }
@@ -105,7 +99,7 @@ class StampAdapter(
     }
 
     init {
-        mLayoutInflater = LayoutInflater.from(context)
+        LayoutInflater.from(context)
         mStampDataArray = data
     }
 }

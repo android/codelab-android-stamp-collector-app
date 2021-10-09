@@ -26,24 +26,37 @@ import java.util.ArrayList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
+import android.R
+
+import android.view.MenuItem
+
+import android.view.Menu
+
+
+
 
 class StampCollectorActivity : AppCompatActivity(){
+
     private lateinit var mStampTitle: Array<String?>
     private var mStampIcon: TypedArray? = null
     private lateinit var mStampCounter: IntArray
     private lateinit var mStampData: ArrayList<StampData?>
+
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: StampAdapter
+
     private lateinit var mSharedPref: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stamp_collector)
+
         mStampTitle = resources.getStringArray(R.array.stamp_title_array)
         mStampCounter = resources.getIntArray(R.array.stamp_counter_array)
         mStampIcon = resources.obtainTypedArray(R.array.stamp_icon_array)
         mSharedPref = getPreferences(MODE_PRIVATE)
         mStampData = loadStamps()
+
         if (mStampData.size == 0) {
             setupData(mStampTitle, mStampIcon, mStampCounter)
         }
@@ -53,6 +66,7 @@ class StampCollectorActivity : AppCompatActivity(){
 
     private fun setupData(title: Array<String?>, icon: TypedArray?, count: IntArray) {
         mStampData = ArrayList()
+
         for (i in title.indices) {
             val instance = StampData()
             instance.stampTitle = title[i]

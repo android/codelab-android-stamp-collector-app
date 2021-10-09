@@ -53,6 +53,7 @@ class AddAndUpdateStampUtility(
             mStampNameEdit.setText(editStamp!!.stampTitle)
             mStampCountEdit.setText(editStamp!!.stampCounter)
         }
+        //handle click listener inside the dialog box
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val stampNameValid = mStampNameEdit.text.toString().isNotEmpty()
             val stampCountValid = mStampCountEdit.text.toString().isNotEmpty()
@@ -81,5 +82,4 @@ class AddAndUpdateStampUtility(
             }
         }
     }
-
 }

@@ -1,0 +1,307 @@
+6. Add/Update/Delete Stamps (Optional)
+
+By now, you have a working app, where you can see some stamps, increase their count, and save and retrieve them. To create a complete basic stamp collector app, let's add a few more features to it, such as adding a new stamp, updating an existing stamp, and deleting a stamp. Let's start by adding and updating a stamp.
+
+Add and Update a Stamp
+1. Add additional resources
+Going forward you will require more string resources. So open res>values>strings.xml, and add the following resources.
+
+<string name="stamp_update_title">Update Stamp</string>
+<string name="stamp_add_title">Add New Stamp</string>
+<string name="save">save</string>
+<string name="cancel">cancel</string>
+
+2. Create Layout for Dialog box
+
+Your app will display a dialog box to the user in order to add or update a stamp. The layout for a Dialog is kept in a separate layout file, so that you can attach it later to a dialog object.
+
+1. Create a new layout file in your Android Studio project:
+- Select File > New > Android resource file.
+- Name the file stamp_dialog_layout.
+- Choose Layout as the resource type.
+- Choose androidx.constraintlayout.widget.ConstraintLayout  as the root element.
+- Leave the default for the other options. Click OK.
+2. Open the stamp_dialog_layout.xml file in the text tab and add the following code inside the ConstraintLayout tag.
+```
+<EditText
+   android:id="@+id/edittext_stampname"
+   android:layout_width="0dp"
+   android:layout_height="wrap_content"
+   android:layout_marginEnd="16dp"
+   android:layout_marginLeft="16dp"
+   android:layout_marginRight="16dp"
+   android:layout_marginStart="16dp"
+   android:layout_marginTop="8dp"
+   android:ems="10"
+   android:hint="@string/stamp_title"
+   android:inputType="textPersonName"
+   app:layout_constraintLeft_toLeftOf="parent"
+   app:layout_constraintRight_toRightOf="parent"
+   app:layout_constraintTop_toTopOf="parent" />
+
+<EditText
+   android:id="@+id/edittext_stampcounter"
+   android:layout_width="0dp"
+   android:layout_height="wrap_content"
+   android:layout_marginLeft="16dp"
+   android:layout_marginRight="16dp"
+   android:layout_marginTop="8dp"
+   android:ems="10"
+   android:hint="@string/stamp_counter"
+   android:inputType="textPersonName"
+   app:layout_constraintLeft_toLeftOf="parent"
+   app:layout_constraintRight_toRightOf="parent"
+   app:layout_constraintTop_toBottomOf="@+id/edittext_stampname" />
+```
+Note: In Android Studio, you see an error saying that the namespace "app" is not bound. To fix the error, press alt+Enter for windows or option+Enter for MacOS**,** Which adds , **xmlns:app="http://schemas.android.com/apk/res-auto"** to the root tag.
+
+3. The stamp_dialog_layout.xml layout file in the Design tab should look like the following:
+https://developer.android.com/codelabs/android-stamp-collector/img/9449b2129a031a2d.png
+
+
+3. Create the AddAndUpdateStampUtility Class
+In this step, you create a class called AddAndUpdateStampUtility to define methods to add and update the stamps.
+
+1. In Android Studio, in the ```StampCollector_Starter_App``` app, right-click java/com.example.stampcollectorapp and select New > Kotlin Class.
+2. Name the new class ```AddAndUpdateStampUtility```, leaving the default options selected.
+3. Add the following code inside the ```AddAndUpdateStampUtility``` class.
+
+Note: While replacing the code, do not change your package name.
+
+```
+class AddAndUpdateStampUtility(
+    private val mContext: Context,
+    private val mStampData: ArrayList<StampData?>,
+    adapter: StampAdapter
+) {
+    private val mAdapter: StampAdapter = adapter
+    private lateinit var mStampNameEdit: EditText
+    private lateinit var mStampCountEdit: EditText
+    private var mEntryValid = false
+}
+```
+
+You will need a ```Context```, as well as ```ArrayList``` and ```RecyclerView.Adapter``` objects, which you will initialise in the constructor of the class. In addition to that, you will also declare two EditText objects, ```mStampNameEdit``` and ```mStampCountEdit```, as member variables which will get the input from the dialog box. At last, you will declare the ```mEntryValid``` boolean variable to check for valid inputs in both EditText views and set it to false.
+
+4. Next you need to define a method which can add or update a stamp. Define a method named addOrUpdateStamp which will take an integer argument position to identify the position of stamp.
+
+```
+fun addOrUpdateStamp(position: Int) {
+}
+```
+
+5. Inside addOrUpdateStamp method, add following code.
+```
+        val dialogView =
+            LayoutInflater.from(mContext).inflate(R.layout.stamp_dialog_layout, null)
+        mStampNameEdit = dialogView.findViewById(R.id.edittext_stampname)
+        mStampCountEdit = dialogView.findViewById(R.id.edittext_stampcounter)
+        
+	val editing = position > -1
+        
+	val dialogTitle =
+            if (editing) mContext.getString(R.string.stamp_update_title) else mContext.getString(
+                R.string.stamp_add_title)
+        
+	val dialog = MaterialAlertDialogBuilder(mContext)
+            .setView(dialogView)
+            .setTitle(dialogTitle)
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+       
+	 if (editing) {
+            val editStamp = mStampData[position]
+            mStampNameEdit.setText(editStamp!!.stampTitle)
+            mStampCountEdit.setText(editStamp!!.stampCounter)
+        }
+```
+
+Note: For the MaterialAlertDialog class, you need to import com.google.android.material.dialog.MaterialAlertDialogBuilder.
+
+After receiving the current stamp position inside ```stampPosition```, you will first need to display a dialog box asking the user to enter or edit the stamp title and stamp count. To display the dialog box, you attach the ```stamp_dialog_layout``` layout to the dialog object.
+
+- If the user wants to edit an existing stamp, they will tap one of the stamps displayed, which will call the ```addOrUpdateStamp()``` method and pass the position of the clicked stamp. The dialog box will be customised accordingly.
+- If the user wants to add a new stamp, they will click the Add Menu item (explained in the next step). In this case, the stamp position will always be -1. The dialog box will be customised for adding a new stamp.
+
+6. To handle the click listener inside the dialog box, further add the following code inside ```addOrUpdateStamp``` method.
+
+```
+dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val stampNameValid = mStampNameEdit.text.toString().isNotEmpty()
+            val stampCountValid = mStampCountEdit.text.toString().isNotEmpty()
+            mEntryValid = stampNameValid && stampCountValid
+            if (mEntryValid) {
+                if (editing) {
+                    val editStamp = mStampData[position]
+                    editStamp!!.stampTitle = mStampNameEdit.text.toString()
+                    editStamp!!.stampCounter = mStampCountEdit
+                        .text.toString().toInt()
+                    mStampData[position] = editStamp
+                    mAdapter.notifyItemChanged(position)
+                } else {
+                    val newStamp = StampData()
+                    newStamp.stampTitle = mStampNameEdit.text.toString()
+                    newStamp.stampCounter = mStampCountEdit
+                        .text.toString().toInt()
+                    mStampData.add(newStamp)
+                    mAdapter.notifyItemInserted(mStampData.size)
+                }
+                dialog.dismiss()
+            } else {
+                Toast.makeText(mContext,
+                    "Please Enter Valid Data",
+                    Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+```
+
+While adding a new stamp or updating an existing stamp, in both cases, you need to update mStampData. You will use the ```mStampData.set()``` method to update, and ```mStampData.add()``` for adding a new stamp.
+
+4. Add a Menu Item
+
+You will start by adding a menu item, which will provide the feature to add a new stamp. To add a menu item, follow these steps
+
+1. Select res folder and right-click:
+2. Select New>Android resource directory.
+3. Select Resource type: menu.
+4. Right click on menu and select New>New Resource File
+5. Provide File Name: stamp_menu.
+6. Click on Ok.
+7. Open stamp_menu.xml in text tab and add the following code inside the menu tag.
+
+```
+<item
+   android:id="@+id/add_new_stamp"
+    android:title="Add Stamp"
+    app:showAsAction="never" />
+```
+Note: In Android Studio, you see an error saying that the namespace "app" is not bound. To fix the error, press alt+Enter for windows or option+Enter for MacOS**,** Which adds , **xmlns:app="http://schemas.android.com/apk/res-auto"** to the root tag.
+
+3. In ```StampCollectorActivity.kt```, declare the member variable ```mAddAndUpdateStampUtility``` of type ```AddAndUpdateStampUtility```.
+```
+private lateinit var mAddAndUpdateStampUtility: AddAndUpdateStampUtility
+```
+
+4. Inside the onCreate() method of StampCollectorActivity, initialize the object mAddAndUpdateStampUtility after the mAdapter object has been initialized.
+
+```
+mAddAndUpdateStampUtility = AddAndUpdateStampUtility(this, mStampData, mAdapter)
+```
+
+5. Inside the ```StampCollectorActivity``` class, add the following two methods.
+
+```
+    fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        getMenuInflater().inflate(R.menu.stamp_menu, menu)
+        return true
+    }
+
+    fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.getItemId()) {
+            R.id.add_new_stamp -> {
+                mAddAndUpdateStampUtility.addOrUpdateStamp(-1)
+                saveStamps()
+            }
+        }
+        return true
+    }
+```
+
+In ```onCreateOptionsMenu``` attach the ```menuItem``` defined in ```stamp_menu.xml``` file. You will use the ```inflate()``` method inside the ```MenuInflater``` class to attach the menu file. Then, in ```onOptionsItemSelected()```, handle the menu items using ```when```. For adding a new stamp, call the method ```addOrUpdateStamp(-1)``` defined in the class ```AddAndUpdateStampUtility```. You will pass -1 as the argument, because you want to add a new stamp here. Any new stamp that is added will be displayed as a generic stamp icon.
+
+After adding a new stamp, you also need to save all the stamps using ```saveStamps()```.
+
+4. Update AddAndUpdateStampUtility Class
+
+1. Now to update an existing stamp. Open the ```StampAdapter``` class and declare an object for ```AddAndUpdateStampUtility``` as a member variable ```mAddAndUpdateStampUtilityAd```.
+```
+private val mAddAndUpdateStampUtilityAd: AddAndUpdateStampUtility
+```
+
+2. Inside an init block after the ```StampAdapter``` inner class, initialize the ```mAddAndUpdateStampAd``` object.
+```
+    init {
+        mAddAndUpdateStampUtilityAd = AddAndUpdateStampUtility(context, mStampDataArray, this)
+    }
+```
+The primary constructor cannot contain any code. Initialization code can be placed in initializer blocks prefixed with the [init](https://kotlinlang.org/docs/classes.html#constructors) keyword.
+
+3. When the user clicks on a stamp displayed in the RecyclerView, you want to display a stamp editing dialog box. The dialog box will contain the latest stamp title and stamp count, which a user can update now. So, you need to implement an onClickListener() on the itemView object inside the constructor of the StampHolder class and call the addOrUpdateStamp() method from the AddAndUpdateStampUtility class. Add the following code inside and init block inside the constructor of the StampHolder class.
+
+```
+        init {
+            //Use OnClick Listeners to Handle Sub Button
+            mSubButton.setOnClickListener { changeStampCount(false) }
+            itemView.setOnClickListener {
+                mAddAndUpdateStampUtilityAd.addOrUpdateStamp(absoluteAdapterPosition)
+            }
+        }
+```
+
+Note: getAdapterPosition() or adapterPosition is deprecated and is replaced with getAbsoluteAdapterPosition() or absoluteAdapterPosition() in Kotlin.
+Now run your application. You should be able to update the title of an existing stamp by clicking it.
+https://developer.android.com/codelabs/android-stamp-collector/img/599700c0709de891.png
+https://developer.android.com/codelabs/android-stamp-collector/img/cb27457a6e6f35e9.png
+
+Delete a Stamp
+In order to delete a stamp, we can use the ItemTouchHelper class which extends the RecyclerView.ItemDecoration class. ItemTouchHelper lets you interact with the list of items using touch in four directions: Left, Right, Up and Down. You can use swipe left or right to delete a stamp.
+
+1. Open ```StampCollectorActivity.kt``` and add the following code inside the ```setUpRecyclerView()``` method.
+```
+        val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder,
+            ): Boolean {
+                return false
+            }
+override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+	}
+})
+```
+
+You are going to use the SimpleCallback abstract class, which provides the methods onMove() and onSwiped().
+
+2. Inside the onSwiped() method, add the following code.
+
+Note: For the MaterialAlertDialog class, you need to import com.google.android.material.dialog.MaterialAlertDialogBuilder.
+This Builder must be used in order for AlertDialog objects to respond to color and shape theming provided by Material themes.
+
+The type of dialog returned is still an AlertDialog.
+
+```
+                val position: Int = viewHolder.absoluteAdapterPosition
+                MaterialAlertDialogBuilder(applicationContext)
+                    .setTitle("Deletion :")
+                    .setMessage("Do you want to delete this stamp ?")
+                    .setPositiveButton("Yes"
+                    ) { _, _ ->
+                        mStampData.removeAt(position)
+                        mAdapter.notifyItemRemoved(position)
+                        saveStamps()
+                    }
+                    .setNegativeButton("No"
+                    ) { dialog, _ ->
+                        mAdapter.notifyItemChanged(viewHolder.absoluteAdapterPosition)
+                        dialog.dismiss()
+                    }
+                    .show()
+```
+This code will display an alert dialog every time the user swipes to delete a stamp, confirming their choice.
+
+3. Finally, attach the helper object to the current RecyclerView object mRecyclerView with the help of the attachToRecyclerView() method. Add the following code at the end of the setUpRecyclerView() method.
+
+```
+helper.attachToRecyclerView(mRecyclerView)
+```
+
+Now run your application and swipe any stamp to the left or right to delete it. You will be asked to confirm your choice to delete the stamp.
+https://developer.android.com/codelabs/android-stamp-collector/img/766392d9a0580fdf.png
+
+
+
+

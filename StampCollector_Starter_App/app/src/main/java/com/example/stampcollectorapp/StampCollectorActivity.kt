@@ -21,22 +21,31 @@ import androidx.appcompat.app.AppCompatActivity
 import java.util.ArrayList
 
 class StampCollectorActivity : AppCompatActivity() {
+
     private lateinit var mStampTitle: Array<String?>
+
     private var mStampIcon: TypedArray? = null
+
     private lateinit var mStampCounter: IntArray
+
     private var mStampData: ArrayList<StampData>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stamp_collector)
+
         mStampTitle = resources.getStringArray(R.array.stamp_title_array)
+
         mStampCounter = resources.getIntArray(R.array.stamp_counter_array)
+
         mStampIcon = resources.obtainTypedArray(R.array.stamp_icon_array)
+
         setupData(mStampTitle, mStampIcon, mStampCounter)
     }
 
     private fun setupData(title: Array<String?>, icon: TypedArray?, count: IntArray) {
         mStampData = ArrayList<StampData>()
+
         for (i in title.indices) {
             val instance = StampData()
             instance.setStampTitle(title[i])

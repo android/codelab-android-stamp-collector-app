@@ -1,0 +1,100 @@
+5. Working with SharedPreferences
+
+When you increase or decrease the counter, the counter value is reflected on the screen, but when you close the activity, the counter values are lost. Use the [SharedPreferences](https://developer.android.com/reference/android/content/SharedPreferences.html) interface to save the counter value of each stamp in the form of a key/value pair inside an XML file.
+
+Implementing SharedPreferences
+
+1. Initialize the SharedPreferences object
+
+1. Add a member variable to the ```StampCollectorActivity``` class inside of a companion object to hold the name of the key you use to save the data.
+
+```
+    companion object {
+        private const val STAMP_KEY = "save_key"
+    }
+```
+
+Also add a member variable to hold a reference to a SharedPreferences object under the member variables of ```mRecyclerView``` and ```mAdapter```.
+```
+private lateinit var mSharedPref: SharedPreferences
+```
+
+2. In the ```onCreate()``` method of ```StampCollectorActivity```, initialize mSharedPref before the ```setupData()``` call.
+
+```
+mSharedPref = getPreferences(MODE_PRIVATE)
+```
+
+The [getPreferences(MODE_PRIVATE)](https://developer.android.com/reference/android/app/Activity.html#getPreferences(int)) method returns a reference to the default SharedPreferences file inside the ```StampCollectorActivity```. ```The MODE_PRIVATE``` parameter makes the file inaccessible outside the app.
+
+Note: When you use the [getPreferences()](https://developer.android.com/reference/android/app/Activity.html#getPreferences(int)) method, the default name of the SharedPreferences file is the same as the name of the activity where you declare it. To set a different name for the preferences file, use the [getSharedPreferences()](https://developer.android.com/reference/android/content/Context.html#getSharedPreferences(java.lang.String,%20int)) method.
+
+2. Save preferences in the onPause() method
+1. To save or update any value inside the SharedPreferences object, you need a  [SharedPreferences.Editor](https://developer.android.com/reference/android/content/SharedPreferences.Editor.html) object. Create a ```saveStamps()``` method inside the ```StampCollectorActivity``` class to save the data in a ```SharedPreferences.Editor``` object.
+
+```
+    private fun saveStamps() {
+        //Editor object to save or update data
+        val editor: SharedPreferences.Editor = mSharedPref.edit()
+        //Convert data in to Json String
+        val gson = Gson()
+        val jsonStamps: String = gson.toJson(mStampData)
+
+        //Save Data inside the SharedPreferences using putString
+        editor.putString(STAMP_KEY, jsonStamps)
+
+        //Confirm the changes
+        editor.apply()
+    }
+```
+
+With the Editor object, you can save data of all primitive data types. You have multiple stamps, you want to save values for multiple instances of the ```StampData``` class, which are inside an ArrayList object ```mStampData```.
+
+The Gson library is used to convert the ```mStampData``` object to String objects. To save data in the form of key/value pairs, use the ```putString()``` method inside the ```SharedPreferences.Editor``` class.
+
+Note: [Gson](https://github.com/google/gson) is a Java library that you can use to convert Java objects into their JSON equivalents. You can also use the Gson library to convert a JSON string to an equivalent Java object.
+
+2. Override ```onPause()``` lifecycle method of the ```StampCollectorActivity``` to call the ```saveStamps()``` method:
+```
+    override fun onPause() {
+        super.onPause()
+        saveStamps()
+    }
+```
+This code saves your stamp data every time the app is closed, when screen is rotated or even if the app is moved into the background.
+
+
+3. Load shared preferences
+
+1. Create a loadStamps() method that returns an array of StampData objects. In loadStamps(), retrieve data using a SharedPreferences object with the same key that was used when the data was saved.
+```
+    private fun loadStamps(): ArrayList<StampData?> {
+        //Fetch the data from the SharedPreferences object
+        val jsonStampString: String? = mSharedPref.getString(STAMP_KEY, "")
+        val gson = Gson()
+        val type: Type = object : TypeToken<List<StampData?>?>() {}.type
+        return gson.fromJson(jsonStampString, type)
+    }
+```With the Gson library, we again convert our Json String Object back to an ArrayList of ```StampData``` and return an array of ```StampData``` objects.
+
+2. Inside the ```onCreate()``` method, call ```loadStamps()``` to initialize the``` mStampData```, right after the ```mSharedPref``` object initialization statement.
+
+```
+mStampData = loadStamps()
+```
+
+3. After calling ```loadStamps()```, when the app is run for first time, ```loadStamps()``` does not return any data, because data is still not saved. You need to load default data. Replace the ```setupData()``` call inside ```onCreate()``` with the following code.
+
+```
+        if (mStampData.size == 0) {
+            setupData(mStampTitle, mStampIcon, mStampCounter)
+        }
+```
+
+Note: Make sure you initialize the mAdapter variable and call the setupRecyclerView() method after data is loaded to the mStampData variable. If you call setupRecyclerView() before the data is loaded, your app will crash.
+
+Now run the app again. This time, the stamp-count data persists across app relaunch.
+
+You have now implemented the SharedPreferences interface in your app. SharedPreferences data is saved locally in your app and will remain there until the app is uninstalled or its data is cleared.
+
+Note: The focus of this codelab is to learn RecyclerView and SharePreferences implementation. In a real app you should create a separate class to save stamps and load stamps for your app, to avoid adding more responsibilities to your activity. And if you have a large amount of data, you should use a handler thread to take the load off from the main thread.
