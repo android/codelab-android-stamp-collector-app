@@ -1,0 +1,125 @@
+2. Getting set up
+
+Download the code
+
+Click the following link to download all the code for this codelab:
+[DOWNLOAD SOURCE CODE](https://github.com/googlecodelabs/android-stamp-collector-app/archive/master.zip).
+
+You can also find it in this [github repository](https://github.com/googlecodelabs/android-stamp-collector-app.git).
+
+Unpack the downloaded zip file. The root folder, which is called StampCollectorApp, includes a folder for each step of this codelab:
+
+The StampCollector_Starter_App folder contains the starter code.
+The StampCollector_Recyclerview folder contains the app after the RecyclerView has been added.
+The StampCollector_SharedPref folder contains the app after SharedPreferences are included.
+The StampCollector_Complete folder contains the completed app, including the functionality to add, update, and delete a stamp.
+App overview
+StampCollectorApp is a simple stamp-collecting app that displays a list of stamps in a RecyclerView. You'll use mock data that's included in the starter app, so take a moment to familiarize yourself with the code in the StampCollector_Starter_App app.
+
+1. Open StampCollector_Starter_App in Android Studio.
+2. If you have any gradle version errors, fix them by updating your gradle version and syncing. (See steps here: [Gradle version update](https://developer.android.com/studio/releases/gradle-plugin)).
+3. Take a look at the code in java/com.example.stampcollectorapp/StampData.java. This class holds stamp attributes, getter methods, and setter methods.
+
+```
+class StampData {
+    var stampTitle: String? = null
+    var stampCounter = 0
+    var stampIcon: Int
+
+    init {
+        stampIcon = R.drawable.general_stamp
+    }
+}
+```
+For this codelab, you use three attributes, mStampTitle, mStampCounter, and mStampIcon, to store the name, quantity, and image resource ID of each stamp. If you wanted to save more data about each stamp, you could use more attributes. By default, there will be a generic stamp icon for all stamps initialized in the constructor, but you can override it by using the setStampIcon()method.
+
+4. The resource file res/values/String.xml contains the mock data required for the app.
+
+```
+<resources>
+    <string name="app_name">Stamp Collector</string>
+
+    <string name="stamp_title">Stamp Name</string>
+    <string name="stamp_pic_desc">Stamp Picture Details</string>
+    <string name="stamp_counter">0</string>
+    <string name="add_counter_button">+</string>
+    <string name="subtract_counter_button">-</string>
+</resources>
+```
+
+5. The resource file res/values/arrays.xml contains the arrays of stamp title and stamp count as default mock data.
+```
+<resources>
+    <string-array name="stamp_title_array">
+        <item>Indian Post</item>
+        <item>Gandhi Post</item>
+        <item>Vivekanand Post</item>
+        <item>Bismillah Khan Post</item>
+        <item>APJ Abdul Kalam Post</item>
+        <item>Mother Teresa Post</item>
+    </string-array>
+
+
+    <integer-array name="stamp_counter_array">
+        <item>0</item>
+        <item>0</item>
+        <item>0</item>
+        <item>0</item>
+        <item>0</item>
+        <item>0</item>
+    </integer-array>
+
+    <integer-array name="stamp_icon_array">
+        <item>@drawable/indian</item>
+        <item>@drawable/gandhi</item>
+        <item>@drawable/vivek</item>
+        <item>@drawable/bismillah</item>
+        <item>@drawable/apj</item>
+        <item>@drawable/mother</item>
+    </integer-array>
+
+</resources>
+```
+
+6. In java/com.example.stampcollectorapp/StampCollectorActivity.java, the data set is initialized using the setupData method. Examine the following code in the StampCollectorActivity class.
+```
+class StampCollectorActivity : AppCompatActivity() {
+
+    private lateinit var mStampTitle: Array<String?>
+
+    private var mStampIcon: TypedArray? = null
+
+    private lateinit var mStampCounter: IntArray
+
+    private var mStampData: ArrayList<StampData>? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_stamp_collector)
+
+        mStampTitle = resources.getStringArray(R.array.stamp_title_array)
+
+        mStampCounter = resources.getIntArray(R.array.stamp_counter_array)
+
+        mStampIcon = resources.obtainTypedArray(R.array.stamp_icon_array)
+        
+        setupData(mStampTitle, mStampIcon, mStampCounter)
+    }
+
+    private fun setupData(title: Array<String?>, icon: TypedArray?, count: IntArray) {
+        mStampData = ArrayList<StampData>()
+        
+        for (i in title.indices) {
+            val instance = StampData()
+            instance.setStampTitle(title[i])
+            instance.setStampIcon(icon!!.getResourceId(i, 0))
+            instance.setStampCounter(count[i])
+            mStampData!!.add(instance)
+        }
+    }
+}
+```
+
+7. Run the app.
+
+You see a Hello World screen for now. In the next step, you will start designing your app.

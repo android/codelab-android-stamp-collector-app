@@ -1,0 +1,9 @@
+7. Finishing up
+
+Congratulations, you're all done!
+
+Test the finished StampCollector app in an emulator and on an actual device, and you see the list of stamps displayed in a RecyclerView. This codelab only introduces you to the concept of using RecyclerView objects and shared preferences. You learned how you can add, update, and even delete a stamp.
+
+You can also add more advanced features, such as letting users snap photos of stamps and add them to the list. You can include a RESTful web service to keep the list of stamps updated as new stamps come on the market.
+
+There are lots of possibilities and ideas that you can incorporate and try. Now use this concept to design something cool of your own.

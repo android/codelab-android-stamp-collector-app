@@ -1,0 +1,21 @@
+3. Setting up the StampCollectorActivity layout
+
+Set up the activity_stamp_collector.xml layout
+
+1. In Android Studio, open the activity_stamp_collector.xml layout file and look at it in the Text tab.
+2. Replace the TextView in the template with the following RecyclerView. You'll use the RecyclerView to display your stamps in a vertical scrollable list.
+
+```
+<androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/mRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+```
+Now switch to the Design tab of the layout. Your UI should look something like the following:
+https://developer.android.com/codelabs/android-stamp-collector/img/777cfbfa9f16440e.png

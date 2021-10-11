@@ -1,0 +1,21 @@
+1. Introduction
+Who else likes to collect postage stamps? Why not learn a few Android concepts while creating a simple stamp collector app? When you have a large amount of data to display, you need a view that can handle the data efficiently. With the help of the RecyclerView class, you can display stamp-collection data very smoothly. To save information about all the stamps you've collected, you can use Android SharedPreferences.
+
+Note: SharedPreferences are used here just for simplicity's purpose. For a real-time application, you want to use other storage options available in Android, such as the SQLite database, Room Database, or Google Cloud storage over the network.
+
+What you'll build
+In this codelab, you will build an app that displays a collection of stamps in a list format and saves data about the stamps. While creating the app, you'll learn how to:
+
+Create your own custom RecyclerView object from scratch.
+Save and load data using shared preferences.
+Add, update, and delete a stamp.
+
+
+What you'll learn
+How to use a RecyclerView object inside an app
+How to save and retrieve data using shared preferences
+What you'll need
+Latest version of Android Studio
+An Android device or emulator to run the app
+The sample code, which you will download in the next step
+Basic knowledge of Android programming in java.
